@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:beingmohit/tranium.git"
+    "url": "git@github.com:beingmohit/libp2p-rpc.git"
   },
   "dependencies": {
     "async": "^2.5.0",
