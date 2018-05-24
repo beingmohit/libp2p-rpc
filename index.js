@@ -101,11 +101,16 @@ class Node extends libp2p {
     
                     debug('peer discovered:', peer.id.toB58String())
     
-                    this.dial(peer, `/${this._options.name}/${this._options.version}`, (protocol, conn) => this._connection(conn, peer, 'outgoing'))
+                    this.dialProtocol(peer, `/${this._options.name}/${this._options.version}`, (err, conn) => {
+                        if( err ) debug('error during dialProtocol', err)
+                        else return this._connection(conn, peer, 'outgoing')
+                    })
                 })
     
                 this.on('peer:connect', (peer) => debug('peer connection:', peer.id.toB58String()))
-                super.handle(`/${this._options.name}/${this._options.version}`, (protocol, conn) => this._connection(conn, null, 'incoming'))
+                super.handle(`/${this._options.name}/${this._options.version}`, (protocol, conn) => {
+                    return this._connection(conn, null, 'incoming')
+                })
 
                 resolve()
             })
