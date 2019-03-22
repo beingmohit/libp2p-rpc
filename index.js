@@ -16,6 +16,7 @@ const Pushable = require('pull-pushable')
 const PeerBook = require('peer-book')
 const TCP = require('libp2p-tcp')
 const WS = require('libp2p-websockets')
+const defaultsDeep = require('@nodeutils/defaults-deep')
 
 class Node extends libp2p {
     constructor(peerInfo, root, options) {
@@ -26,28 +27,45 @@ class Node extends libp2p {
             service: 'Protocol',
             bootstrapers: [],
             multicastDNS: {
-                interval: 10000   
+                interval: 10000,
+                enabled: true   
             }
         }, options)
 
-        const modules = {
-            transport: [
-                new TCP(),
-                new WS()
-            ],
-            connection: {
-                muxer: [
-                    spdy
+        const defaults = {
+            modules: {
+                transport: [
+                    TCP,
+                    WS
                 ],
-                crypto: [
+                streamMuxer: [
+                    spdy,
+                ],
+                connEncryption: [
                     secio
-                ]
+                ],
+                peerDiscovery: [
+                    Railing,
+                    MulticastDNS
+                ],
+                dht: DHT
             },
-            discovery: [
-                new Railing(options.bootstrapers),
-                new MulticastDNS(peerInfo, options.multicastDNS || {})
-            ],
-            dht: DHT
+
+            config: {
+                peerDiscovery: {
+                    mdns: options.multicastDNS || {enabled: false},
+                    bootstrap: {
+                        interval: 2000,
+                        enabled: true,
+                        list: options.bootstrapers
+                    }
+                },
+                dht: {
+                    kBucketSize: 20,
+                    // enabled: true,
+                    enabledDiscovery: true
+                },
+            }
         }
 
         const peerBook = new PeerBook()
@@ -55,7 +73,7 @@ class Node extends libp2p {
         peerInfo.multiaddrs.add('/ip4/0.0.0.0/tcp/0')
         peerInfo.multiaddrs.add('/ip4/0.0.0.0/tcp/0/ws')
 
-        super(modules, peerInfo, peerBook, options)
+        super(defaultsDeep({peerInfo}, defaults))
         this._options = options
         this._handlers = {}
         this._requests = {}
