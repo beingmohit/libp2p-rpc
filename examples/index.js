@@ -10,7 +10,8 @@ const config = {
     version: '1.0.0',
     bootstrapers: [],
     multicastDNS: {
-        interval: 1000   
+        interval: 1000,
+        enabled: true
     }
 }
 
