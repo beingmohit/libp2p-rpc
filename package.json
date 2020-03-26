@@ -3,7 +3,6 @@
   "version": "0.1.2",
   "description": "A libp2p node with rpc using protocol buffers.",
   "main": "index.js",
-  "author": "Mohit Agrawal <beingmohit09@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
